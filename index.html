@@ -9,7 +9,6 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
     --bg: #0a0a0a;
     --surface: #111111;
@@ -21,192 +20,230 @@
     --mono: 'DM Mono', monospace;
     --sans: 'DM Sans', sans-serif;
   }
-
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    overflow: hidden;
-  }
-
-  /* grid lines background */
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); overflow: hidden; }
   body::before {
     content: '';
     position: fixed; inset: 0;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
     background-size: 60px 60px;
-    pointer-events: none;
-    z-index: 0;
+    pointer-events: none; z-index: 0;
   }
-
-  /* radial glow */
   body::after {
     content: '';
-    position: fixed;
-    top: -20%; left: 50%;
-    transform: translateX(-50%);
+    position: fixed; top: -20%; left: 50%; transform: translateX(-50%);
     width: 700px; height: 700px;
     background: radial-gradient(circle, rgba(200,245,106,0.07) 0%, transparent 65%);
-    pointer-events: none;
-    z-index: 0;
+    pointer-events: none; z-index: 0;
   }
 
+  /* ── creature ── */
+  .creature {
+    position: fixed;
+    bottom: 24px; right: 32px;
+    z-index: 2;
+    width: 130px;
+    animation: wobble 0.22s infinite alternate;
+    transform-origin: bottom center;
+    opacity: 0.82;
+  }
+  .creature:hover { opacity: 1; cursor: default; }
+  .speech {
+    position: fixed;
+    bottom: 148px; right: 30px;
+    z-index: 3;
+    background: #1a1a1a;
+    border: 1px solid rgba(200,245,106,0.3);
+    border-radius: 10px 10px 2px 10px;
+    padding: 6px 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    animation: speechpop 4s infinite;
+  }
+  .speech::after {
+    content: '';
+    position: absolute;
+    bottom: -7px; right: 10px;
+    border: 7px solid transparent;
+    border-top-color: rgba(200,245,106,0.3);
+    border-bottom: 0;
+  }
+
+  @keyframes wobble {
+    from { transform: rotate(-4deg) scaleY(1); }
+    to   { transform: rotate(4deg) scaleY(0.97); }
+  }
+  @keyframes eyepop {
+    0%,90%,100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.08); }
+  }
+  @keyframes speechpop {
+    0%,100% { opacity: 0; transform: translateY(4px); }
+    15%,80% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes armflail {
+    0%   { transform: rotate(-30deg); }
+    50%  { transform: rotate(30deg); }
+    100% { transform: rotate(-30deg); }
+  }
+
+  /* ── layout ── */
   .shell {
     position: relative; z-index: 1;
     height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
     padding: 2rem;
   }
-
   .eyebrow {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 3rem;
-    opacity: 0;
-    animation: rise 0.7s 0.1s forwards;
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 3rem;
+    opacity: 0; animation: rise 0.7s 0.1s forwards;
   }
-
-  .tiles {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 3rem;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
+  .tiles { display: flex; gap: 16px; margin-bottom: 3rem; flex-wrap: wrap; justify-content: center; }
   .tile {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    opacity: 0;
-    animation: rise 0.6s forwards;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    opacity: 0; animation: rise 0.6s forwards;
   }
-  .tile:nth-child(1) { animation-delay: 0.2s; }
-  .tile:nth-child(2) { animation-delay: 0.32s; }
-  .tile:nth-child(3) { animation-delay: 0.44s; }
-  .tile:nth-child(4) { animation-delay: 0.56s; }
-
+  .tile:nth-child(1){animation-delay:0.2s}.tile:nth-child(2){animation-delay:0.32s}
+  .tile:nth-child(3){animation-delay:0.44s}.tile:nth-child(4){animation-delay:0.56s}
   .tile-box {
     width: 130px; height: 120px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.3s;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
   }
   .tile-box::before {
-    content: '';
-    position: absolute;
-    inset: 0;
+    content: ''; position: absolute; inset: 0;
     background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
   }
-  .tile:last-child .tile-box {
-    border-color: rgba(200,245,106,0.35);
-    background: var(--accent-dim);
-  }
-
+  .tile:last-child .tile-box { border-color: rgba(200,245,106,0.35); background: var(--accent-dim); }
   .tile-num {
-    font-family: var(--mono);
-    font-size: 52px;
-    font-weight: 300;
-    letter-spacing: -0.02em;
-    color: var(--text);
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
+    font-family: var(--mono); font-size: 52px; font-weight: 300;
+    letter-spacing: -0.02em; color: var(--text);
+    font-variant-numeric: tabular-nums; line-height: 1;
     position: relative; z-index: 1;
-    transition: transform 0.15s ease;
   }
   .tile:last-child .tile-num { color: var(--accent); }
-
-  .tile-label {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
+  .tile-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
   .sep {
-    font-family: var(--mono);
-    font-size: 36px;
-    font-weight: 300;
-    color: var(--border);
-    align-self: flex-start;
-    margin-top: 28px;
-    opacity: 0;
-    animation: rise 0.5s 0.4s forwards;
+    font-family: var(--mono); font-size: 36px; font-weight: 300; color: var(--border);
+    align-self: flex-start; margin-top: 28px;
+    opacity: 0; animation: rise 0.5s 0.4s forwards;
   }
-
   .status {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    opacity: 0;
-    animation: rise 0.7s 0.7s forwards;
+    font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.1em;
+    display: flex; align-items: center; gap: 8px;
+    opacity: 0; animation: rise 0.7s 0.7s forwards;
   }
-  .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: blink 1.8s infinite;
-  }
-
-  .past-msg {
-    font-family: var(--mono);
-    font-size: 24px;
-    font-weight: 300;
-    color: var(--accent);
-    letter-spacing: 0.06em;
-    text-align: center;
-  }
-
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes blink {
-    0%,100% { opacity: 1; }
-    50%      { opacity: 0.2; }
-  }
-  @keyframes flip {
-    0%   { transform: translateY(0); }
-    30%  { transform: translateY(-6px); }
-    60%  { transform: translateY(3px); }
-    100% { transform: translateY(0); }
-  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 1.8s infinite; }
+  .past-msg { font-family: var(--mono); font-size: 24px; font-weight: 300; color: var(--accent); letter-spacing: 0.06em; text-align: center; }
+  @keyframes rise { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  @keyframes flip { 0%{transform:translateY(0)} 30%{transform:translateY(-6px)} 60%{transform:translateY(3px)} 100%{transform:translateY(0)} }
   .flip { animation: flip 0.18s ease; }
-
-  @media (max-width: 540px) {
-    .tile-box { width: 78px; height: 80px; }
-    .tile-num { font-size: 32px; }
-    .sep { font-size: 24px; margin-top: 20px; }
-    .tiles { gap: 8px; }
+  @media(max-width:540px){
+    .tile-box{width:78px;height:80px} .tile-num{font-size:32px} .sep{font-size:24px;margin-top:20px} .tiles{gap:8px}
+    .creature{width:90px;bottom:12px;right:12px} .speech{bottom:110px;right:10px}
   }
 </style>
 </head>
 <body>
+
+<!-- speech bubble -->
+<div class="speech" id="speech">DEADLINE IS COMING!!</div>
+
+<!-- SVG creature: a little bug-eyed gremlin -->
+<svg class="creature" viewBox="0 0 130 160" xmlns="http://www.w3.org/2000/svg">
+  <!-- shadow -->
+  <ellipse cx="65" cy="155" rx="38" ry="6" fill="rgba(0,0,0,0.4)"/>
+
+  <!-- left arm (flailing) -->
+  <g style="transform-origin:30px 95px; animation: armflail 0.3s infinite linear;">
+    <rect x="6" y="88" width="26" height="9" rx="4" fill="#2a2a1a"/>
+    <rect x="2" y="88" width="10" height="9" rx="4" fill="#3a3a20"/>
+    <!-- claws left -->
+    <line x1="2" y1="88" x2="-3" y2="83" stroke="#c8f56a" stroke-width="2" stroke-linecap="round"/>
+    <line x1="2" y1="92" x2="-4" y2="90" stroke="#c8f56a" stroke-width="2" stroke-linecap="round"/>
+    <line x1="2" y1="96" x2="-3" y2="100" stroke="#c8f56a" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- right arm (flailing opposite) -->
+  <g style="transform-origin:100px 95px; animation: armflail 0.3s infinite linear; animation-direction: reverse;">
+    <rect x="98" y="88" width="26" height="9" rx="4" fill="#2a2a1a"/>
+    <rect x="118" y="88" width="10" height="9" rx="4" fill="#3a3a20"/>
+    <!-- claws right -->
+    <line x1="128" y1="88" x2="133" y2="83" stroke="#c8f56a" stroke-width="2" stroke-linecap="round"/>
+    <line x1="128" y1="92" x2="134" y2="90" stroke="#c8f56a" stroke-width="2" stroke-linecap="round"/>
+    <line x1="128" y1="96" x2="133" y2="100" stroke="#c8f56a" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- body -->
+  <ellipse cx="65" cy="105" rx="34" ry="38" fill="#1e1e10"/>
+  <ellipse cx="65" cy="102" rx="28" ry="32" fill="#2a2a18"/>
+  <!-- belly stripes -->
+  <ellipse cx="65" cy="108" rx="16" ry="8" fill="rgba(200,245,106,0.08)"/>
+  <ellipse cx="65" cy="116" rx="10" ry="5" fill="rgba(200,245,106,0.06)"/>
+
+  <!-- neck -->
+  <rect x="52" y="66" width="26" height="16" rx="6" fill="#2a2a18"/>
+
+  <!-- head -->
+  <ellipse cx="65" cy="55" rx="38" ry="34" fill="#2a2a18"/>
+  <ellipse cx="65" cy="52" rx="34" ry="30" fill="#323220"/>
+
+  <!-- ears/horns -->
+  <polygon points="28,30 18,4 40,22" fill="#1e1e10"/>
+  <polygon points="31,28 22,6 41,22" fill="#2a2a18"/>
+  <polygon points="102,30 112,4 90,22" fill="#1e1e10"/>
+  <polygon points="99,28 108,6 89,22" fill="#2a2a18"/>
+
+  <!-- left eye -->
+  <ellipse cx="46" cy="50" rx="14" ry="17" fill="white"/>
+  <ellipse cx="46" cy="52" rx="10" ry="13" fill="#ff3030" style="animation: eyepop 2.1s infinite;"/>
+  <ellipse cx="46" cy="52" rx="6" ry="8" fill="#1a0000"/>
+  <ellipse cx="44" cy="49" rx="2.5" ry="2.5" fill="white"/>
+  <!-- vein lines left eye -->
+  <line x1="33" y1="42" x2="38" y2="46" stroke="rgba(255,80,80,0.5)" stroke-width="1"/>
+  <line x1="32" y1="50" x2="37" y2="50" stroke="rgba(255,80,80,0.4)" stroke-width="1"/>
+
+  <!-- right eye -->
+  <ellipse cx="84" cy="50" rx="14" ry="17" fill="white"/>
+  <ellipse cx="84" cy="52" rx="10" ry="13" fill="#ff3030" style="animation: eyepop 2.1s 1s infinite;"/>
+  <ellipse cx="84" cy="52" rx="6" ry="8" fill="#1a0000"/>
+  <ellipse cx="82" cy="49" rx="2.5" ry="2.5" fill="white"/>
+  <!-- vein lines right eye -->
+  <line x1="97" y1="42" x2="92" y2="46" stroke="rgba(255,80,80,0.5)" stroke-width="1"/>
+  <line x1="98" y1="50" x2="93" y2="50" stroke="rgba(255,80,80,0.4)" stroke-width="1"/>
+
+  <!-- eyebrow furrow -->
+  <path d="M34 36 Q46 30 52 35" stroke="#c8f56a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M96 36 Q84 30 78 35" stroke="#c8f56a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- mouth — wide open scream -->
+  <path d="M44 72 Q65 88 86 72" stroke="#1a1a0a" stroke-width="2" fill="#1a1a0a"/>
+  <path d="M44 72 Q65 92 86 72" fill="#0a0500"/>
+  <!-- teeth -->
+  <rect x="50" y="72" width="7" height="7" rx="1" fill="rgba(240,237,232,0.9)"/>
+  <rect x="61" y="74" width="8" height="8" rx="1" fill="rgba(240,237,232,0.9)"/>
+  <rect x="73" y="72" width="7" height="7" rx="1" fill="rgba(240,237,232,0.9)"/>
+
+  <!-- sweat drops -->
+  <ellipse cx="20" cy="38" rx="3" ry="4.5" fill="rgba(100,180,255,0.5)" transform="rotate(-15,20,38)"/>
+  <ellipse cx="110" cy="32" rx="2.5" ry="4" fill="rgba(100,180,255,0.5)" transform="rotate(15,110,32)"/>
+
+  <!-- legs -->
+  <rect x="46" y="138" width="16" height="18" rx="6" fill="#1e1e10"/>
+  <rect x="68" y="138" width="16" height="18" rx="6" fill="#1e1e10"/>
+  <ellipse cx="54" cy="156" rx="10" ry="5" fill="#161608"/>
+  <ellipse cx="76" cy="156" rx="10" ry="5" fill="#161608"/>
+</svg>
+
 <div class="shell">
   <p class="eyebrow">8 June 2026 &nbsp;·&nbsp; 18:00 CEST &nbsp;·&nbsp; Copenhagen</p>
-
   <div class="tiles" id="tiles">
     <div class="tile">
       <div class="tile-box"><span class="tile-num" id="n-days">--</span></div>
@@ -228,7 +265,6 @@
       <span class="tile-label">seconds</span>
     </div>
   </div>
-
   <div class="status" id="status">
     <span class="dot" id="dot"></span>
     <span id="status-txt">Syncing…</span>
@@ -238,39 +274,41 @@
 <script>
   const TARGET = new Date('2026-06-08T18:00:00+02:00');
   const ids = ['n-days','n-hours','n-mins','n-secs'];
-  const prev = ['--','--','--','--'];
+  const phrases = [
+    'DEADLINE IS COMING!!',
+    'WHY HAVE I NOT CHOSE YET???',
+    "OMG IT'S ALMOST TIME!!",
+    'AAAAAAAAAAHHHHH',
+    'NOT READY. NOT READY.',
+    'NOT ENOUGH SECONDS!!',
+  ];
+  let pi = 0;
+  setInterval(() => {
+    pi = (pi+1) % phrases.length;
+    document.getElementById('speech').textContent = phrases[pi];
+  }, 4000);
 
   function pad(n){ return String(n).padStart(2,'0'); }
-
   function animateNum(el, val){
     if(el.textContent === val) return;
-    el.classList.remove('flip');
-    void el.offsetWidth;
-    el.textContent = val;
-    el.classList.add('flip');
+    el.classList.remove('flip'); void el.offsetWidth;
+    el.textContent = val; el.classList.add('flip');
   }
-
   function tick(){
     const diff = TARGET - new Date();
     if(diff <= 0){
       document.getElementById('tiles').innerHTML = '<p class="past-msg">Time\'s up.</p>';
       document.getElementById('dot').style.background = '#ff6b6b';
       document.getElementById('status-txt').textContent = '8 June 2026 — 18:00 reached';
+      document.getElementById('speech').textContent = 'IT IS HERE. IT IS HERE.';
       return;
     }
     const s = Math.floor(diff/1000);
-    const vals = [
-      pad(Math.floor(s/86400)),
-      pad(Math.floor((s%86400)/3600)),
-      pad(Math.floor((s%3600)/60)),
-      pad(s%60)
-    ];
+    const vals = [pad(Math.floor(s/86400)), pad(Math.floor((s%86400)/3600)), pad(Math.floor((s%3600)/60)), pad(s%60)];
     ids.forEach((id,i) => animateNum(document.getElementById(id), vals[i]));
-
     const t = new Date().toLocaleTimeString('da-DK',{timeZone:'Europe/Copenhagen',hour:'2-digit',minute:'2-digit',second:'2-digit'});
     document.getElementById('status-txt').textContent = 'Copenhagen — ' + t;
   }
-
   tick();
   setInterval(tick, 1000);
 </script>
