@@ -97,6 +97,18 @@
     align-items: center; justify-content: center;
     padding: 2rem;
   }
+  .main-title {
+    font-family: var(--sans);
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    margin-bottom: 0.6rem;
+    opacity: 0;
+    animation: rise 0.8s 0s forwards;
+  }
+  .main-title span { color: var(--accent); font-weight: 400; }
+
   .eyebrow {
     font-family: var(--mono); font-size: 10px;
     letter-spacing: 0.22em; text-transform: uppercase;
@@ -243,6 +255,7 @@
 </svg>
 
 <div class="shell">
+  <h1 class="main-title">Time to decide <span>Helaaaaa!</span></h1>
   <p class="eyebrow">8 June 2026 &nbsp;·&nbsp; 18:00 CEST &nbsp;·&nbsp; Copenhagen</p>
   <div class="tiles" id="tiles">
     <div class="tile">
