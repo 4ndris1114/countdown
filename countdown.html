@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countdown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: rgba(255,255,255,0.08);
+    --accent: #c8f56a;
+    --accent-dim: rgba(200,245,106,0.12);
+    --text: #f0ede8;
+    --muted: rgba(240,237,232,0.38);
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    overflow: hidden;
+  }
+
+  /* grid lines background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* radial glow */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -20%; left: 50%;
+    transform: translateX(-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(200,245,106,0.07) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .shell {
+    position: relative; z-index: 1;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 2rem;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: rise 0.7s 0.1s forwards;
+  }
+
+  .tiles {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    animation: rise 0.6s forwards;
+  }
+  .tile:nth-child(1) { animation-delay: 0.2s; }
+  .tile:nth-child(2) { animation-delay: 0.32s; }
+  .tile:nth-child(3) { animation-delay: 0.44s; }
+  .tile:nth-child(4) { animation-delay: 0.56s; }
+
+  .tile-box {
+    width: 130px; height: 120px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .tile-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+  }
+  .tile:last-child .tile-box {
+    border-color: rgba(200,245,106,0.35);
+    background: var(--accent-dim);
+  }
+
+  .tile-num {
+    font-family: var(--mono);
+    font-size: 52px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    position: relative; z-index: 1;
+    transition: transform 0.15s ease;
+  }
+  .tile:last-child .tile-num { color: var(--accent); }
+
+  .tile-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .sep {
+    font-family: var(--mono);
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--border);
+    align-self: flex-start;
+    margin-top: 28px;
+    opacity: 0;
+    animation: rise 0.5s 0.4s forwards;
+  }
+
+  .status {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: rise 0.7s 0.7s forwards;
+  }
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: blink 1.8s infinite;
+  }
+
+  .past-msg {
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    text-align: center;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.2; }
+  }
+  @keyframes flip {
+    0%   { transform: translateY(0); }
+    30%  { transform: translateY(-6px); }
+    60%  { transform: translateY(3px); }
+    100% { transform: translateY(0); }
+  }
+  .flip { animation: flip 0.18s ease; }
+
+  @media (max-width: 540px) {
+    .tile-box { width: 78px; height: 80px; }
+    .tile-num { font-size: 32px; }
+    .sep { font-size: 24px; margin-top: 20px; }
+    .tiles { gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <p class="eyebrow">8 June 2026 &nbsp;·&nbsp; 18:00 CEST &nbsp;·&nbsp; Copenhagen</p>
+
+  <div class="tiles" id="tiles">
+    <div class="tile">
+      <div class="tile-box"><span class="tile-num" id="n-days">--</span></div>
+      <span class="tile-label">days</span>
+    </div>
+    <div class="sep">:</div>
+    <div class="tile">
+      <div class="tile-box"><span class="tile-num" id="n-hours">--</span></div>
+      <span class="tile-label">hours</span>
+    </div>
+    <div class="sep">:</div>
+    <div class="tile">
+      <div class="tile-box"><span class="tile-num" id="n-mins">--</span></div>
+      <span class="tile-label">minutes</span>
+    </div>
+    <div class="sep">:</div>
+    <div class="tile">
+      <div class="tile-box"><span class="tile-num" id="n-secs">--</span></div>
+      <span class="tile-label">seconds</span>
+    </div>
+  </div>
+
+  <div class="status" id="status">
+    <span class="dot" id="dot"></span>
+    <span id="status-txt">Syncing…</span>
+  </div>
+</div>
+
+<script>
+  const TARGET = new Date('2026-06-08T18:00:00+02:00');
+  const ids = ['n-days','n-hours','n-mins','n-secs'];
+  const prev = ['--','--','--','--'];
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function animateNum(el, val){
+    if(el.textContent === val) return;
+    el.classList.remove('flip');
+    void el.offsetWidth;
+    el.textContent = val;
+    el.classList.add('flip');
+  }
+
+  function tick(){
+    const diff = TARGET - new Date();
+    if(diff <= 0){
+      document.getElementById('tiles').innerHTML = '<p class="past-msg">Time\'s up.</p>';
+      document.getElementById('dot').style.background = '#ff6b6b';
+      document.getElementById('status-txt').textContent = '8 June 2026 — 18:00 reached';
+      return;
+    }
+    const s = Math.floor(diff/1000);
+    const vals = [
+      pad(Math.floor(s/86400)),
+      pad(Math.floor((s%86400)/3600)),
+      pad(Math.floor((s%3600)/60)),
+      pad(s%60)
+    ];
+    ids.forEach((id,i) => animateNum(document.getElementById(id), vals[i]));
+
+    const t = new Date().toLocaleTimeString('da-DK',{timeZone:'Europe/Copenhagen',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    document.getElementById('status-txt').textContent = 'Copenhagen — ' + t;
+  }
+
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>
